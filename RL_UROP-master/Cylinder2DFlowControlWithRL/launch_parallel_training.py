@@ -44,14 +44,14 @@ if __name__ == '__main__':
     config["tau"] = 5e-3
     config["gamma"] = 0.99
     config["train_freq"] = 1
-    config["target_update_interval"] = 1
-    config["gradient_steps"] = 48
+    #config["target_update_interval"] = 1
+    config["gradient_steps"] = 22
 
+    config["target_policy_noise"] = 0.1
+    config["policy_delay"]=2
     config["buffer_size"] = int(10e5)
     config["optimize_memory_usage"] = False
-
-    config["ent_coef"] = "auto_0.01"
-    config["target_entropy"] = "auto"
+    
     policy_kwargs = dict(net_arch=dict(pi=[1024,1024,512], qf=[1024, 1024, 1024, 512]))
     checkpoint_callback = CheckpointCallback(
                                             save_freq=max(5, 1),
@@ -59,12 +59,12 @@ if __name__ == '__main__':
                                             #save_buffer=True,
                                             #save_env_stats=True,
                                             save_path=savedir,
-                                            name_prefix='TQC4SP30FS_model')
+                                            name_prefix='TD3_model')
 
 
     env = SubprocVecEnv([resume_env(nb_actuations,i) for i in range(number_servers)], start_method='spawn')
     env = VecFrameStack(env, n_stack=35)
-    model = TQC('MlpPolicy', VecNormalize(env, gamma=0.99), tensorboard_log=savedir, **config)
+    model = TD3('MlpPolicy', VecNormalize(env, gamma=0.99), tensorboard_log=savedir, **config)
     model.learn(15000000, callback=[checkpoint_callback], log_interval=1)
 
    
