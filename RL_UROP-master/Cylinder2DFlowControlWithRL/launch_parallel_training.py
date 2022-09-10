@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     env = SubprocVecEnv([resume_env(nb_actuations,i) for i in range(number_servers)], start_method='spawn')
     env = VecFrameStack(env, n_stack=35)
-    model = TD3('MlpPolicy', VecNormalize(env, gamma=0.99), tensorboard_log=savedir, **config)
+    model = TD3('MlpPolicy', VecNormalize(env, gamma=0.99), tensorboard_log=savedir, policy_kwargs =policy_kwargs, **config)
     model.learn(15000000, callback=[checkpoint_callback], log_interval=1)
 
    
